@@ -127,20 +127,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AdvancedDPLL.cpp" />
+    <ClCompile Include="AdvancedFormula.cpp" />
     <ClCompile Include="Formula.cpp" />
     <ClCompile Include="input_class.cpp" />
+    <ClCompile Include="RecordChange.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="DPLL.cpp" />
     <ClCompile Include="Vtoc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdvancedDPLL.h" />
+    <ClInclude Include="AdvancedFormula.h" />
     <ClInclude Include="dpll.h" />
     <ClInclude Include="formula.h" />
+    <ClInclude Include="RecordChange.h" />
     <ClInclude Include="vtoc.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\instances\cpusat.cnf" />
+    <None Include="..\instances\sat-php-20-20.cnf" />
     <None Include="..\instances\sat_test.cnf" />
+    <None Include="..\instances\unsat-php-10-5.cnf" />
+    <None Include="..\instances\unsat-php-15-10.cnf" />
     <None Include="..\instances\unsat.cnf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

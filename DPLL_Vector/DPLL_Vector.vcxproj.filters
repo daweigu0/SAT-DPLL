@@ -30,6 +30,15 @@
     <ClCompile Include="Vtoc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="AdvancedDPLL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AdvancedFormula.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RecordChange.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="formula.h">
@@ -41,6 +50,15 @@
     <ClInclude Include="vtoc.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="AdvancedDPLL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AdvancedFormula.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RecordChange.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\instances\sat_test.cnf">
@@ -50,6 +68,15 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="..\instances\cpusat.cnf">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\instances\sat-php-20-20.cnf">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\instances\unsat-php-10-5.cnf">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\instances\unsat-php-15-10.cnf">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>

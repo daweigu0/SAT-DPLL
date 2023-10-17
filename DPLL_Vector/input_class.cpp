@@ -4,6 +4,7 @@
 #include<vector>
 #include<sstream>
 #include"formula.h"
+#include"AdvancedFormula.h"
 #include"vtoc.h"
 using namespace std;
 extern Vtoc variableId_to_Clauses;
@@ -68,7 +69,8 @@ public:
 	int getClauseCnt() {
 		return this->clause_cnt;
 	}
-	void readClauses(Formula& f) {
+	template<typename T>
+	void readClauses(T& f) {
 		//cout << "readClausesº¯Êý" << endl;
 		Vtoc& m = variableId_to_Clauses;
 		vector<clause>& clauses = f.clauses;
