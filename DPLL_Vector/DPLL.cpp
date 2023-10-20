@@ -190,12 +190,9 @@
 //	if (DPLL::isClausesEmpty(f)) return COMPLETE;
 //	DPLL::pureLiteralSimplify(f);
 //	if (DPLL::isClausesEmpty(f)) return COMPLETE;
-//	int cnt = 0;
-//	for (int i = 1; i < variableId_to_Clauses.size(); i++) {
-//		if (!variableId_to_Clauses.at(i).empty()) cnt++;
-//	}
 //	stack<Formula*> s;
 //	s.push(&f);
+//	//int cnt = 0;
 //	while (!s.empty())
 //	{
 //		Formula* temp_f_ptr = s.top();
@@ -205,7 +202,10 @@
 //		int result_up = DPLL::up(*temp_f_ptr);
 //		//temp_f_ptr->printFormula();
 //		//cout << "result_up: " << result_up << endl;
-//		if (result_up == SAT) return COMPLETE;
+//		if (result_up == SAT) {
+//			//temp_f_ptr->printFormula();
+//			return COMPLETE;
+//		}
 //		if (result_up == UNSAT) {
 //			//temp_f_ptr->printFormula();
 //			delete temp_f_ptr;
@@ -221,7 +221,10 @@
 //			int result_branch_one = DPLL::applyVariableAssign(*temp_f_ptr, abs(var_id), value);
 //			// << "result_branch_one: " << result_branch_one << endl;
 //			//temp_f_ptr->printFormula();
-//			if (result_branch_one == SAT) return COMPLETE;
+//			if (result_branch_one == SAT) {
+//				//temp_f_ptr->printFormula();
+//				return COMPLETE;
+//			}
 //			if (result_branch_one == UNSAT) delete temp_f_ptr;
 //			if (result_branch_one == NORMAL) s.push(temp_f_ptr);
 //			//copy_f->printFormula();
@@ -229,7 +232,10 @@
 //			int result_branch_two = DPLL::applyVariableAssign(*copy_f, abs(var_id), !value);
 //			//cout << "result_branch_two: " << result_branch_two << endl;
 //			//copy_f->printFormula();
-//			if (result_branch_two == SAT) return COMPLETE;
+//			if (result_branch_two == SAT) {
+//				//temp_f_ptr->printFormula();
+//				return COMPLETE;
+//			}
 //			if (result_branch_two == UNSAT) delete copy_f;
 //			if (result_branch_two == NORMAL) s.push(copy_f);
 //		}

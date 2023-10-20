@@ -43,10 +43,23 @@ extern Vtoc variableId_to_Clauses;
 //	auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
 //	cout << duration.count() / 1000.0 << endl;
 //}
-
+void verify(AdvancedFormula& f) {
+	for (int i = 1; i < f.variables_cnt + 1; i++) {
+		bool value = (bool)AdvancedFormula::variables_assign_ptr[i];
+		cout << i << " -> " << value << endl;
+		if (value != -1) {
+			int result = AdvancedDPLL::applyVariableAssign(f, i, value);
+			if (result == 0 || result == 1) {
+				cout << result << endl;
+				return;
+			}
+		}
+	}
+	cout << "No" << endl;
+}
 void testAdvancedDPLL1() {
-	string filename = "../instances/unsat-php-15-10.cnf";
-	cout << filename << endl;
+	string filename = "C:\\Users\\l1768\\Desktop\\sat\\DPLLÅàÑµ\\DPLLÅàÑµ\\SAT²âÊÔ±¸Ñ¡ËãÀý\\Beijing\\2bitcomp_5.cnf";
+	cout << filename << endl;  
 	Input input(filename);
 	AdvancedFormula* f_ptr = new AdvancedFormula();
 	f_ptr->setCurrentClausesCnt(input.getClauseCnt());
@@ -54,12 +67,15 @@ void testAdvancedDPLL1() {
 	variableId_to_Clauses.setVtocSize(input.getBoolVarCnt());
 	input.readClauses<AdvancedFormula>(*f_ptr);
 	f_ptr->initVariablesAssignAndFlipFlag(input.getBoolVarCnt());
+	AdvancedFormula* verify_f = new AdvancedFormula(*f_ptr);
 	auto start = chrono::high_resolution_clock::now();
 	int result = AdvancedDPLL::solverByIncrementalUpdate(*f_ptr);
 	auto stop = chrono::high_resolution_clock::now();
 	AdvancedDPLL::showResult(result);
 	auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
 	cout << "ºÄÊ±£º" << duration.count() / 1000.0 << "s" << endl;
+	verify(*verify_f);
+	delete verify_f; 
 }
 
 void testAdvancedDPLL2(string filename) {
@@ -72,12 +88,15 @@ void testAdvancedDPLL2(string filename) {
 	variableId_to_Clauses.setVtocSize(input.getBoolVarCnt());
 	input.readClauses<AdvancedFormula>(*f_ptr);
 	f_ptr->initVariablesAssignAndFlipFlag(input.getBoolVarCnt());
+	AdvancedFormula* verify_f = new AdvancedFormula(*f_ptr);
 	auto start = chrono::high_resolution_clock::now();
 	int result = AdvancedDPLL::solverByIncrementalUpdate(*f_ptr);
 	auto stop = chrono::high_resolution_clock::now();
 	AdvancedDPLL::showResult(result);
 	auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
 	cout << duration.count() / 1000.0 << endl;
+	verify(*verify_f);
+	delete verify_f;
 }
 int main(int argc,char* argv[]) {
 	//test2(argv[1]);

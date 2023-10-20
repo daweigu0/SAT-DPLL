@@ -45,8 +45,8 @@ void AdvancedFormula::printFormula() {
 			int var_id = Vtoc::idxToVariableId(i);
 			cout << "variable_id: " << var_id << " clause_id: ";
 			for (auto& clause_id : variableId_to_Clauses.at(i)) {
-				if(!this->clauses[clause_id].flag)
-					cout << clause_id << " ";
+				if (!this->clauses[clause_id].flag)
+					cout << clause_id << " L:" << this->clauses[clause_id].length << " ";
 			}
 			cout << endl;
 		}

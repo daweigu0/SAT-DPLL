@@ -43,17 +43,24 @@ bool AdvancedDPLL::deleteVariableByClauseId(AdvancedFormula& f, int clause_idx, 
 	if (!f.clauses[clause_idx].flag) {
 		for (auto& item : f.clauses[clause_idx].variables) {
 			if (!item.flag && item.variable_id == variable_id) {
-				item.flag = !item.flag;
+				item.flag = true;
 				rc.delete_variables.push_back(make_pair(clause_idx, item.variable_id));//可优化
 				break;
 			}
 		}
 		int res = --f.clauses[clause_idx].length;
 		if (res == 0) {
-			f.clauses[clause_idx].flag = !f.clauses[clause_idx].flag;
+			f.clauses[clause_idx].flag = true;
 			f.current_clauses_cnt--;
 			rc.delete_clauses.push_back(clause_idx);
 			flag = true;
+			for (int i = 0; i < f.unit_clauses.size(); i++) {
+				if (f.unit_clauses[i] == clause_idx) {
+					rc.unit_clauses_remove.push_back(clause_idx);
+					f.unit_clauses[i] = f.unit_clauses.back();
+					f.unit_clauses.pop_back();
+				}
+			}
 		}
 		if (res == 1) {
 			f.unit_clauses.push_back(clause_idx);
@@ -74,7 +81,24 @@ int AdvancedDPLL::findNoDeleteVariableByClauseId(AdvancedFormula& f, int clause_
 	}
 	return 0;
 }
-
+int AdvancedDPLL::applyVariableAssign(AdvancedFormula& f, int variable_id, bool value) {
+	RecordChange rc(RecordChange::moms_flag);
+	int var_id = value ? variable_id : -variable_id;
+	if (variableId_to_Clauses.find(var_id) != 0) {
+		for (auto& clause_id : variableId_to_Clauses[var_id]) {
+			AdvancedDPLL::deleteClause(f, clause_id, rc);
+			if (AdvancedDPLL::isClausesEmpty(f)) return SAT;
+		}
+	}
+	var_id = -var_id;
+	if (variableId_to_Clauses.find(var_id) != 0) {
+		for (auto& clause_id : variableId_to_Clauses[var_id]) {
+			bool flag = AdvancedDPLL::deleteVariableByClauseId(f, clause_id, var_id, rc);
+			if (flag) return UNSAT;
+		}
+	}
+	return NORMAL;
+}
 int AdvancedDPLL::applyVariableAssign(AdvancedFormula& f, int variable_id, bool value,RecordChange& rc) {
 	AdvancedFormula::flip_flag_ptr[variable_id]++;
 	AdvancedFormula::variables_assign_ptr[variable_id] = value;
@@ -128,6 +152,7 @@ void AdvancedDPLL::pureLiteralSimplify(AdvancedFormula& f) {
 int AdvancedDPLL::up(AdvancedFormula& f,RecordChange& rc) {
 	bool unit_clause_find = false;
 	vector<int>& uc = f.unit_clauses;
+	//cout << "单子句传播: ";
 	do
 	{
 		unit_clause_find = false;
@@ -136,11 +161,14 @@ int AdvancedDPLL::up(AdvancedFormula& f,RecordChange& rc) {
 			int clause_id = uc.back();
 			rc.unit_clauses_remove.push_back(clause_id);
 			uc.pop_back();
+			//cout << clause_id << " VarId:";
 			int var_id = AdvancedDPLL::findNoDeleteVariableByClauseId(f, clause_id);
+			//cout << var_id << " ";
 			bool value = var_id > 0 ? true : false;
 			int result = AdvancedDPLL::applyVariableAssign(f, abs(var_id), value,rc);
 			if (result == SAT || result == UNSAT) return result;
 		}
+		//cout << endl;
 	} while (unit_clause_find);
 	return NORMAL;
 }
@@ -178,7 +206,7 @@ int AdvancedDPLL::momsSelectVariable(AdvancedFormula& f) {
 			min_clauses.push_back(i);
 		}
 	}
-	int n = (int)variableId_to_Clauses.size() + 1;
+	int n = f.variables_cnt+1;
 	int* bucket_count = new int[n];
 	fill(bucket_count, bucket_count + n, 0);
 	int max_emerge_cnt = INT_MIN;
@@ -264,6 +292,7 @@ void AdvancedDPLL::upBackTrackingHelpFun(AdvancedFormula& f, RecordChange& rc) {
 	}
 }
 int AdvancedDPLL::momsBackTrackingHelpFun(AdvancedFormula& f, RecordChange& rc) {
+	if (rc.assign_var_id.empty()) return -1;
 	for (const auto& clause_id : rc.delete_clauses) {
 		f.clauses[clause_id].flag = false;
 		f.current_clauses_cnt++;
@@ -308,29 +337,36 @@ int AdvancedDPLL::upFailBackTracking(AdvancedFormula& f, stack<RecordChange*>& s
 	else {
 		s.push(rc_top);
 	}
-	while (!(!(s.top()->up_or_moms_flag) && s.size() == 1)) {
+	while (!s.empty()) {
 		RecordChange*& up_rc = s.top();
 		s.pop();
 		AdvancedDPLL::upBackTrackingHelpFun(f, *up_rc);
 		delete up_rc;
+		//f.printFormula();
 		RecordChange*& moms_rc = s.top();
 		s.pop();
 		int var_id = AdvancedDPLL::momsBackTrackingHelpFun(f, *moms_rc);
+		//f.printFormula();
 		delete moms_rc;
 		if (var_id != -1) return var_id;
 	}
 	return NORMAL;
 }
 int AdvancedDPLL::momsFailBackTracking(AdvancedFormula& f, stack<RecordChange*>& s) {
-	while (!(!(s.top()->up_or_moms_flag) && s.size() == 1)) {
+	while (!s.empty()) {
 		RecordChange*& moms_rc = s.top();
 		s.pop();
 		int var_id = AdvancedDPLL::momsBackTrackingHelpFun(f, *moms_rc);
-		//f.print();
+		//f.printFormula();
 		if (var_id != -1) return var_id;
 		if (var_id == -1) {//unordered_map实现的代码这个地方可能有问题，回头要用代码的时候要检查一下。
+			if (s.empty()) {
+				delete moms_rc;
+				return -1;
+			}
 			RecordChange*& up_rc = s.top();
 			AdvancedDPLL::upBackTrackingHelpFun(f, *up_rc);
+			//f.printFormula();
 			delete up_rc;
 		}
 		delete moms_rc;
@@ -345,12 +381,14 @@ int AdvancedDPLL::backTracking(AdvancedFormula& f, stack<RecordChange*>& s, bool
 
 int AdvancedDPLL::solverByIncrementalUpdate(AdvancedFormula& f) {
 	if (AdvancedDPLL::isClausesEmpty(f)) return COMPLETE;
-	AdvancedDPLL::pureLiteralSimplify(f);
+		AdvancedDPLL::pureLiteralSimplify(f);
 	if (AdvancedDPLL::isClausesEmpty(f)) return COMPLETE;
 	stack<RecordChange*> stack_rc;
-	do
+	stack_rc.push(new RecordChange(RecordChange::moms_flag));
+	while(!stack_rc.empty())
 	{
 		RecordChange* rc_up = new RecordChange(RecordChange::up_flag);
+		//f.printFormula();
 		int result_up = AdvancedDPLL::up(f,*rc_up);
 		stack_rc.push(rc_up);
 		int var_id = -1;
@@ -377,6 +415,7 @@ int AdvancedDPLL::solverByIncrementalUpdate(AdvancedFormula& f) {
 		if (result_apply_variable == SAT) return COMPLETE;
 		if (result_apply_variable == UNSAT) {
 			int result_back = AdvancedDPLL::backTracking(f, stack_rc, RecordChange::moms_flag);
+			//f.printFormula();
 			if (result_back == NORMAL) {
 				//cout << "2这里返回的-1\n";
 				return NORMAL;
@@ -384,8 +423,7 @@ int AdvancedDPLL::solverByIncrementalUpdate(AdvancedFormula& f) {
 			int variable_id = AdvancedFormula::variables_assign_ptr[result_back] == 1 ? 0 - result_back : result_back;
 			AdvancedDPLL::addUnitClause(f, variable_id);
 		}
-	} while (!(stack_rc.size() == 1 && ((stack_rc.top())->up_or_moms_flag == RecordChange::up_flag)));
-	//cout << "这里返回的-1\n";
+	}
 	return NORMAL;
 }
 

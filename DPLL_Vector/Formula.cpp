@@ -43,7 +43,8 @@
 //			int var_id = Vtoc::idxToVariableId(i);
 //			cout << "variable_id: " << var_id << " clause_id: ";
 //			for (auto& clause_id : variableId_to_Clauses.at(i)) {
-//				cout << clause_id << " ";
+//				if(this->clauses[clause_id].flag==false)
+//					cout << clause_id << " ";
 //			}
 //			cout << endl;
 //		}

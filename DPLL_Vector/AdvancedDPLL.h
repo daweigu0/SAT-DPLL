@@ -12,6 +12,7 @@ public:
 	static bool deleteVariableByClauseId(AdvancedFormula& f, int clause_idx, int variable_id, RecordChange& rc);
 	static bool isClausesEmpty(AdvancedFormula& f);
 	static int findNoDeleteVariableByClauseId(AdvancedFormula& f, int clause_id);
+	static int applyVariableAssign(AdvancedFormula& f, int variable_id, bool value);
 	static int applyVariableAssign(AdvancedFormula& f, int variable_id, bool value, RecordChange& rc);
 	static void pureLiteralSimplify(AdvancedFormula& f);
 	static int up(AdvancedFormula& f,RecordChange& rc);
