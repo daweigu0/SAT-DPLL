@@ -9,5 +9,3 @@
 4. 北京算例测试时间。
 
 ![image](https://github.com/DaWeiGu0/SAT-DPLL/assets/61080587/763da5a9-86c3-45c6-b836-96523c2caaa7)
-
-5. 水平有限，代码写的可能比较烂。
